@@ -1,0 +1,25 @@
+!!!
+%html
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title GraphiQL
+    %link{href: "https://cdnjs.cloudflare.com/ajax/libs/graphiql/2.4.7/graphiql.min.css", rel: "stylesheet"}/
+  %body{style: "margin: 0; height: 100vh;"}
+    #graphiql{style: "height: 100vh;"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/graphiql/2.4.7/graphiql.min.js"}
+    :javascript
+      const graphiql = React.createElement(GraphiQL, {
+        fetcher: async (graphQLParams) => {
+          const data = await fetch('/graphql', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(graphQLParams),
+          });
+          return data.json();
+        },
+      });
+      ReactDOM.render(graphiql, document.getElementById('graphiql'));
