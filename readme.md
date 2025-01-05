@@ -19,10 +19,17 @@ compatibility constraints.
 ## Features
 - Product types and part categories managed by admin.
 - Pre-configured products for customization.
-- Automatic compatibility rules for part options.
+- Compatibility rules for part options.
 - Dynamic navbar with all available product types.
 - Full checkout and order management for admins.
 - Price rule system for complex pricing.
+
+## System Design
+
+### Architecture Overview
+- API-Driven Design: GraphQL APIs for efficient communication between frontend and backend.
+- Componentized Frontend: React components enable reusability and dynamic UI rendering.
+- Database: Structured to handle complex relationships between products, parts, rules, and carts.
 
 ## Tech Stack
 
@@ -42,11 +49,12 @@ compatibility constraints.
 
 ## Setup Instructions
 
-1. Clone the repository: `git clone <repository_url>`
+1. Clone the repository: `git clone https://github.com/christoandrew/bicycle_shop`
 2. Install Ruby dependencies: `bundle install`
-3. Install Node dependencies: `pnpm install`
-4. Start the backend: `bundke exec rerun puma`
+3. Start the backend: `bundle exec rerun puma`
+4. Install Node dependencies: `cd client && npm install`
 5. Start the frontend: `pnpm dev`
+6. Open `http://localhost:5173` in your browser.
 
 ## Data Model Design
 
@@ -167,55 +175,100 @@ erDiagram
     products ||--|| product_types: "has"
 ```
 
-## Main User Workflows
-
-### Admin Workflows
-
-#### 1. Product Configuration Page
-
-- **Implementation**:
-  ```javascript
-  // React component using GraphQL
-  const ProductConfigurator = ({ productId }) => {
-    // Dynamic option loading
-    // Price calculation
-    // Compatibility checking
-  }
-  ```
-- **Key Features**:
-    - Real-time price updates
-    - Dynamic option filtering
-    - Stock availability checking
-
-#### 2. Add to Cart Process
-
-- Validates configuration completeness
-- Checks stock availability
-- Creates configuration record
-- Adds to cart with quantity
-
-### Admin Workflows
-
-#### 1. Product Management
-
-- Create new product types
-- Configure product options
-- Set base prices
-- Manage stock levels
-
-#### 2. Price Rule Management
-
-- Set individual option prices
-- Configure combination prices
-- Define special pricing rules
-
-#### 3. Compatibility Management
-
-- Define required combinations
-- Set excluded combinations
-- Manage rule priorities
-
 ## Database Schema and Field Descriptions
+
+Below are the tables and their fields:
+
+### **cart_items**
+
+- **cart_id**: Foreign key linking to `carts`.
+- **product_id**: Foreign key linking to `products`.
+- **quantity**: Number of items in the cart.
+- **selected_options**: JSON representing selected options for the product.
+- **created_at**: Timestamp when the cart item was created.
+- **updated_at**: Timestamp when the cart item was last updated.
+
+### **carts**
+
+- **session_id**: Identifier for the user session.
+- **created_at**: Timestamp when the cart was created.
+- **updated_at**: Timestamp when the cart was last updated.
+- **checked_out_at**: Timestamp when the cart was checked out.
+
+### **compatibility_rules**
+
+- **product_type_id**: Foreign key linking to `product_types`.
+- **requiring_option_id**: Part option requiring compatibility.
+- **required_option_id**: Part option that is compatible.
+- **rule_type**: Type of rule (e.g., mandatory or exclusion).
+- **active**: Boolean indicating if the rule is active.
+- **created_at**: Timestamp when the rule was created.
+- **updated_at**: Timestamp when the rule was last updated.
+
+### **part_categories**
+
+- **name**: Name of the part category.
+- **required**: Boolean indicating if the category is required.
+- **product_type_id**: Foreign key linking to `product_types`.
+- **position**: Display order for the category.
+- **active**: Boolean indicating if the category is active.
+- **created_at**: Timestamp when the category was created.
+- **updated_at**: Timestamp when the category was last updated.
+
+### **part_options**
+
+- **name**: Name of the part option.
+- **price**: Price of the part option.
+- **part_category_id**: Foreign key linking to `part_categories`.
+- **position**: Display order for the option.
+- **in_stock**: Boolean indicating if the option is in stock.
+- **stock_quantity**: Number of items available.
+- **created_at**: Timestamp when the option was created.
+- **updated_at**: Timestamp when the option was last updated.
+
+### **price_rule_conditions**
+
+- **price_rule_id**: Foreign key linking to `price_rules`.
+- **part_option_id**: Foreign key linking to `part_options`.
+- **created_at**: Timestamp when the condition was created.
+- **updated_at**: Timestamp when the condition was last updated.
+
+### **price_rules**
+
+- **description**: Description of the pricing rule.
+- **active**: Boolean indicating if the rule is active.
+- **product_type_id**: Foreign key linking to `product_types`.
+- **price**: Price defined by the rule.
+- **created_at**: Timestamp when the rule was created.
+- **updated_at**: Timestamp when the rule was last updated.
+
+### **product_selections**
+
+- **product_id**: Foreign key linking to `products`.
+- **part_option_id**: Foreign key linking to `part_options`.
+- **created_at**: Timestamp when the selection was created.
+- **updated_at**: Timestamp when the selection was last updated.
+
+### **product_types**
+
+- **name**: Name of the product type.
+- **code**: Unique code for the product type.
+- **description**: Description of the product type.
+- **active**: Boolean indicating if the product type is active.
+- **created_at**: Timestamp when the product type was created.
+- **updated_at**: Timestamp when the product type was last updated.
+
+### **products**
+
+- **name**: Name of the product.
+- **description**: Description of the product.
+- **base_price**: Base price of the product.
+- **preconfigured**: Boolean indicating if the product is preconfigured.
+- **product_type_id**: Foreign key linking to `product_types`.
+- **in_stock**: Boolean indicating if the product is in stock.
+- **active**: Boolean indicating if the product is active.
+- **created_at**: Timestamp when the product was created.
+- **updated_at**: Timestamp when the product was last updated.## Database Schema and Field Descriptions
 
 Below are the tables and their fields:
 
@@ -310,6 +363,56 @@ Below are the tables and their fields:
 - **created_at**: Timestamp when the product was created.
 - **updated_at**: Timestamp when the product was last updated.
 
+## Main User Workflows
+
+### Admin Workflows
+
+#### 1. Product Configuration Page
+
+- **Implementation**:
+  ```javascript
+  // React component using GraphQL
+  const ProductConfigurator = ({ productId }) => {
+    // Dynamic option loading
+    // Price calculation
+    // Compatibility checking
+  }
+  ```
+- **Key Features**:
+    - Real-time price updates
+    - Dynamic option filtering
+    - Stock availability checking
+
+#### 2. Add to Cart Process
+
+- Validates configuration completeness
+- Checks stock availability
+- Creates product record
+- Adds to cart with quantity
+
+### Admin Workflows
+
+#### 1. Product Management
+
+- Create new product types
+- Configure product options
+- Set base prices
+- Manage stock levels
+
+#### 2. Price Rule Management
+
+- Set individual option prices
+- Configure combination prices
+- Define special pricing rules
+
+#### 3. Compatibility Management
+
+- Define required combinations
+- Set excluded combinations
+- Manage rule priorities
+
+
+
 ## Key Implementation Decisions
 
 ### 1. Price Calculation Strategy
@@ -326,102 +429,14 @@ end
 ```
 
 - Handles complex pricing scenarios
-- Optimized for performance
 - Maintainable and testable
 
-### 2. Stock Management
-
-- Real-time stock tracking
-- Reservation system during checkout
-- Stock threshold notifications
-
-### 3. Compatibility Engine
+### 2. Compatibility Engine
 
 - Rule-based system
 - Cached results for performance
 - Handles circular dependencies
 
-## Performance Considerations
-
-### Database Optimization
-
-- Strategic indexing on frequently queried fields
-- Composite indexes for common queries
-- Careful denormalization where needed
-
-### Caching Strategy
-
-- Fragment caching for product pages
-- Query result caching
-- Price calculation caching
-
-## Testing Strategy
-
-### Unit Tests
-
-```ruby
-RSpec.describe Product, type: :model do
-  describe '#calculate_price' do
-    context 'with complex rules' do
-      it 'applies correct combination pricing'
-      it 'handles overlapping rules'
-    end
-  end
-end
-```
-
-### Integration Tests
-
-- GraphQL query tests
-- End-to-end workflows
-- Price calculation scenarios
-
-## Future Extensibility
-
-### Planned Features
-
-1. Additional product types
-2. Advanced inventory management
-3. Bulk price updates
-4. Customer configuration saving
-
-### Architecture Considerations
-
-- Modular design for new features
-- Scalable database design
-- API versioning strategy
-
-## Development Setup
-
-[Setup instructions...]
-
-## Deployment Strategy
-
-[Deployment details...]
-
-## Known Limitations and Trade-offs
-
-1. **Complex Price Rules**
-    - **Pro**: Flexible pricing system
-    - **Con**: Performance impact on large catalogs
-    - **Mitigation**: Caching and optimization
-
-2. **Product Type System**
-    - **Pro**: Future-proof design
-    - **Con**: Added complexity for simple products
-    - **Mitigation**: Default templates
-
-3. **GraphQL Implementation**
-    - **Pro**: Efficient data fetching
-    - **Con**: Learning curve for team
-    - **Mitigation**: Detailed documentation
-
-4. **Stock Management**
-    - **Pro**: Real-time tracking
-    - **Con**: Potential race conditions
-    - **Mitigation**: Optimistic locking
-
-## Conclusion
 
 This architecture provides a robust foundation for Marcus's current needs while enabling future growth. The system is
 designed to be maintainable, performant, and extensible, with careful consideration given to real-world usage patterns
