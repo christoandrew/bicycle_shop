@@ -24,6 +24,17 @@ compatibility constraints.
 - Full checkout and order management for admins.
 - Price rule system for complex pricing.
 
+## Screenshots
+![Home Page](screenshots/home.png)
+![Product Page](screenshots/products.png)
+![Product Configuration](screenshots/configuration.png)
+![Cart Page](screenshots/shopping-cart.png)
+![Compability rules](screenshots/compatibility-rules.png)
+![Price rules](screenshots/price-rules.png)
+![Admin Order](screenshots/admin-orders.png)
+![Admin Products](screenshots/admin-products.png)
+
+
 ## System Design
 
 ### Architecture Overview
