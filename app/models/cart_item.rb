@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-
 class CartItem < ActiveRecord::Base
   belongs_to :cart
   belongs_to :product
+
   validates_presence_of :cart, :product, :quantity
 
   def total_price

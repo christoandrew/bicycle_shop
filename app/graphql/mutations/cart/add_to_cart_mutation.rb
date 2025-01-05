@@ -22,7 +22,7 @@ module Mutations
         # Ensure the selected options are valid and in stock
         selected_options.each do |option|
           option = PartOption.find_by(id: option["optionId"].to_i)
-          if option.nil?
+          if option.nil? || !option.in_stock?
             return { errors: ["Invalid or out-of-stock option: #{option_id}"] }
           end
         end

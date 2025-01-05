@@ -4,6 +4,16 @@ require "securerandom"
 class GraqhQLController < Sinatra::Base
   register Sinatra::ActiveRecordExtension
 
+  helpers do
+    def logger
+      request.logger
+    end
+
+    def current_user
+      Thread[:user]
+    end
+  end
+
   enable :sessions
 
   set :session_secret, '638af413ebdfdc3a1e4aab7263cbb732104fc75c098e9a120cc03e287ea745c177c128bc359c61b15a693264986fc60e6e41a0bc73ef308865be78d7901a02e3'

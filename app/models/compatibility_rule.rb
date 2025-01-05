@@ -3,6 +3,7 @@ class CompatibilityRule < ActiveRecord::Base
   belongs_to :requiring_option, class_name: 'PartOption'
   belongs_to :required_option, class_name: 'PartOption'
 
+  validates_presence_of :requiring_option, :required_option, :product_type
   validates :rule_type, presence: true, inclusion: { in: %w[requires excludes] }
   validate :options_belong_to_same_product_type
   validate :options_are_different
@@ -14,6 +15,7 @@ class CompatibilityRule < ActiveRecord::Base
   private
 
   def options_belong_to_same_product_type
+    return false unless requiring_option && required_option
     unless requiring_option.part_category.product_type_id == product_type_id &&
       required_option.part_category.product_type_id == product_type_id
       errors.add(:base, "Both options must belong to the same product type")
@@ -43,6 +45,7 @@ class CompatibilityRule < ActiveRecord::Base
   end
 
   def part_categories_are_not_the_same
+    return false unless required_option && requiring_option
     if requiring_option.part_category_id == required_option.part_category_id
       errors.add(:base, "Cannot create a rule between the same part category")
     end

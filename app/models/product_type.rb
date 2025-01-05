@@ -4,6 +4,7 @@ class ProductType < ActiveRecord::Base
   has_many :products, dependent: :restrict_with_error
   has_many :part_options, through: :part_categories
   has_many :price_rules
+  has_many :compatibility_rules
 
   validates :name, presence: true, uniqueness: true
   validates :code, presence: true, uniqueness: true

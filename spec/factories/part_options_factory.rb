@@ -1,60 +1,25 @@
-require './spec/spec_helper'
-
 FactoryBot.define do
-  factory :full_suspension_frame_option, class: PartOption do
-    name { "Full-suspension" }
-    part_category { create :bicycle_frame_category }
-    price { "9.99" }
+  factory :part_option do
+    sequence(:name) { |n| "Option #{n}" }
+    price { 49.99 }
     in_stock { true }
-  end
+    stock_quantity { 100 }
+    sequence(:position) { |n| n }
+    association :part_category
 
-  factory :carbon_frame_option, class: PartOption do
-    name { "Carbon" }
-    part_category { create :bicycle_frame_category }
-    price { "9.99" }
-    in_stock { true }
-  end
+    factory :full_suspension_option do
+      name { "Full Suspension" }
+      price { 130.00 }
+    end
 
-  factory :tubeless_tire_option, class: PartOption do
-    name { "Tubeless" }
-    part_category { create :bicycle_tire_category }
-    price { "9.99" }
-    in_stock { true }
-  end
+    factory :matte_finish_option do
+      name { "Matte Finish" }
+      price { 35.00 }
+    end
 
-  factory :clincher_tire_option, class: PartOption do
-    name { "Clincher" }
-    part_category { create :bicycle_tire_category }
-    price { "9.99" }
-    in_stock { true }
+    factory :road_wheels_option do
+      name { "Road Wheels" }
+      price { 80.00 }
+    end
   end
-
-  factory :matte_finish_option, class: PartOption do
-    name { "Matte Finish" }
-    part_category { create :bicycle_finish_category }
-    price { "9.99" }
-    in_stock { true }
-  end
-
-  factory :gloss_finish_option, class: PartOption do
-    name { "Gloss Finish" }
-    part_category { create :bicycle_finish_category }
-    price { "9.99" }
-    in_stock { true }
-  end
-
-  factory :aero_wheel_option, class: PartOption do
-    name { "Aero" }
-    part_category { create :bicycle_wheel_category }
-    price { "9.99" }
-    in_stock { true }
-  end
-
-  factory :light_wheel_option, class: PartOption do
-    name { "Light" }
-    part_category { create :bicycle_wheel_category }
-    price { "9.99" }
-    in_stock { true }
-  end
-
 end
